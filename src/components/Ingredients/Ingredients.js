@@ -25,6 +25,10 @@ const Ingredients = () => {
     );
   }, []);
 
+  useEffect(() => {
+    console.log("RENDERING INGREDIENTS!", userIngredients);
+  }, [userIngredients]);
+
   const addIngredientHandler = (ingredient) => {
     fetch("https://udemy-reacthooks-review-default-rtdb.firebaseio.com/.json", {
       method: "POST",
