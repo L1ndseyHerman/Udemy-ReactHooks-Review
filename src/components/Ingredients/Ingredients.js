@@ -35,9 +35,19 @@ const Ingredients = () => {
   };
 
   const removeIngredientHandler = (ingredientId) => {
-    setUserIngredients((prevIngredients) =>
-      prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
-    );
+    //  Need backticks to choose which item to delete:
+    //  Hmm, my Firebase doesn't have an "ingredients" section. Is that why the filter doesn't work?
+    fetch(
+      //`https://udemy-reacthooks-review-default-rtdb.firebaseio.com/ingredients/${ingredientId}.json`,
+      `https://udemy-reacthooks-review-default-rtdb.firebaseio.com/${ingredientId}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((response) => {
+      setUserIngredients((prevIngredients) =>
+        prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
+      );
+    });
   };
 
   return (
