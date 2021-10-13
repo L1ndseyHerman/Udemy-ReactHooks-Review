@@ -8,12 +8,26 @@ const Ingredients = () => {
   const [userIngredients, setUserIngredients] = useState([]);
 
   const addIngredientHandler = (ingredient) => {
-    //  Ingredient is already an object, so putting an object inside of an object! ...ingredient gets
-    //  all of its properties.
-    setUserIngredients((prevIngredients) => [
-      ...prevIngredients,
-      { id: Math.random().toString(), ...ingredient },
-    ]);
+    fetch("https://udemy-reacthooks-review-default-rtdb.firebaseio.com/.json", {
+      method: "POST",
+      //  JSON can .stringify() an object OR an array!
+      body: JSON.stringify(ingredient),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        //  Ingredient is already an object, so putting an object inside of an object! ...ingredient gets
+        //  all of its properties.
+        setUserIngredients((prevIngredients) => [
+          ...prevIngredients,
+          //  This gets the auto-generated id from Firebase!
+          { id: responseData.name, ...ingredient },
+        ]);
+      });
   };
 
   const removeIngredientHandler = (ingredientId) => {
