@@ -29,6 +29,10 @@ const Ingredients = () => {
     console.log("RENDERING INGREDIENTS!", userIngredients);
   }, [userIngredients]);
 
+  const filteredIngredientsHandler = (filteredIngredients) => {
+    setUserIngredients(filteredIngredients);
+  };
+
   const addIngredientHandler = (ingredient) => {
     fetch("https://udemy-reacthooks-review-default-rtdb.firebaseio.com/.json", {
       method: "POST",
@@ -63,7 +67,7 @@ const Ingredients = () => {
       <IngredientForm onAddIngredient={addIngredientHandler} />
 
       <section>
-        <Search />
+        <Search onLoadIngredients={filteredIngredientsHandler} />
         <IngredientList
           ingredients={userIngredients}
           onRemoveItem={removeIngredientHandler}
