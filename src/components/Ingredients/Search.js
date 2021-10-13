@@ -11,7 +11,7 @@ const Search = React.memo((props) => {
 
   useEffect(() => {
     //  Only send the query if the user stopped typing for 500 milliseconds:
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       //  This enteredFilter is whatever it was 500ms ago:
       if (enteredFilter === inputRef.current.value) {
         //  More backticks:
@@ -38,6 +38,9 @@ const Search = React.memo((props) => {
         );
       }
     }, 500);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [enteredFilter, onLoadIngredients, inputRef]);
 
   return (
