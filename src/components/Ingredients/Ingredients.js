@@ -7,7 +7,7 @@ import Search from "./Search";
 const Ingredients = () => {
   const [userIngredients, setUserIngredients] = useState([]);
 
-  const addIngrediantHandler = (ingredient) => {
+  const addIngredientHandler = (ingredient) => {
     //  Ingredient is already an object, so putting an object inside of an object! ...ingredient gets
     //  all of its properties.
     setUserIngredients((prevIngredients) => [
@@ -16,13 +16,22 @@ const Ingredients = () => {
     ]);
   };
 
+  const removeIngredientHandler = (ingredientId) => {
+    setUserIngredients((prevIngredients) =>
+      prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
+    );
+  };
+
   return (
     <div className="App">
-      <IngredientForm onAddIngredient={addIngrediantHandler} />
+      <IngredientForm onAddIngredient={addIngredientHandler} />
 
       <section>
         <Search />
-        <IngredientList ingredients={userIngredients} onRemoveItem={() => {}} />
+        <IngredientList
+          ingredients={userIngredients}
+          onRemoveItem={removeIngredientHandler}
+        />
       </section>
     </div>
   );
