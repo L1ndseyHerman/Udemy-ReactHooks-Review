@@ -1,17 +1,33 @@
-import React, { useState, useCallback } from "react";
+import React, { useReducer, useState, useCallback } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
 import ErrorModal from "../UI/ErrorModal";
 import Search from "./Search";
 
+//  A reminder that reducers go outside the component function:
+const ingredientReducer = (currentIngredients, action) => {
+  switch (action.type) {
+    case "SET":
+      return action.ingredients;
+    case "ADD":
+      return [...currentIngredients, action.ingredient];
+    case "DELETE":
+      return currentIngredients.filter((ing) => ing.id !== action.id);
+    default:
+      throw new Error("Should not get there!");
+  }
+};
+
 const Ingredients = () => {
-  const [userIngredients, setUserIngredients] = useState([]);
+  const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
+  //const [userIngredients, setUserIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
-    setUserIngredients(filteredIngredients);
+    //setUserIngredients(filteredIngredients);
+    dispatch({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
   const addIngredientHandler = (ingredient) => {
@@ -31,11 +47,15 @@ const Ingredients = () => {
       .then((responseData) => {
         //  Ingredient is already an object, so putting an object inside of an object! ...ingredient gets
         //  all of its properties.
-        setUserIngredients((prevIngredients) => [
+        /*setUserIngredients((prevIngredients) => [
           ...prevIngredients,
           //  This gets the auto-generated id from Firebase!
           { id: responseData.name, ...ingredient },
-        ]);
+        ]);*/
+        dispatch({
+          type: "ADD",
+          ingredient: { id: responseData.name, ...ingredient },
+        });
       });
   };
 
@@ -52,9 +72,10 @@ const Ingredients = () => {
     )
       .then((response) => {
         setIsLoading(false);
-        setUserIngredients((prevIngredients) =>
+        /*setUserIngredients((prevIngredients) =>
           prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
-        );
+        );*/
+        dispatch({ type: "DELETE", id: ingredientId });
       })
       .catch((error) => {
         //setError(error.message);
