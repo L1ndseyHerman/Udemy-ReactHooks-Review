@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback, useMemo } from "react";
+import React, { useReducer, useCallback, useMemo, useEffect } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -22,19 +22,40 @@ const ingredientReducer = (currentIngredients, action) => {
 
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
-  const { isLoading, error, data, sendRequest } = useHttp();
+  const { isLoading, error, data, sendRequest, reqExtra, reqIdentifier } =
+    useHttp();
 
   //const [userIngredients, setUserIngredients] = useState([]);
   //const [isLoading, setIsLoading] = useState(false);
   //const [error, setError] = useState();
+
+  useEffect(() => {
+    //  Only need the id for a Delete request:
+    if (!isLoading && !error && reqIdentifier === "REMOVE_INGREDIENT") {
+      dispatch({ type: "DELETE", id: reqExtra });
+    } else if (!isLoading && !error && reqIdentifier === "ADD_INGREDIENT") {
+      dispatch({
+        type: "ADD",
+        ingredient: { id: data.name, ...reqExtra },
+      });
+    }
+  }, [data, reqExtra, reqIdentifier, isLoading, error]);
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
     //setUserIngredients(filteredIngredients);
     dispatch({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
-  const addIngredientHandler = useCallback((ingredient) => {
-    /*dispatchHttp({ type: "SEND" });
+  const addIngredientHandler = useCallback(
+    (ingredient) => {
+      sendRequest(
+        "https://udemy-reacthooks-review-default-rtdb.firebaseio.com/.json",
+        "POST",
+        JSON.stringify(ingredient),
+        ingredient,
+        "ADD_INGREDIENT"
+      );
+      /*dispatchHttp({ type: "SEND" });
     fetch("https://udemy-reacthooks-review-default-rtdb.firebaseio.com/.json", {
       method: "POST",
       //  JSON can .stringify() an object OR an array!
@@ -60,13 +81,18 @@ const Ingredients = () => {
           ingredient: { id: responseData.name, ...ingredient },
         });
       });*/
-  }, []);
+    },
+    [sendRequest]
+  );
 
   const removeIngredientHandler = useCallback(
     (ingredientId) => {
       sendRequest(
         `https://udemy-reacthooks-review-default-rtdb.firebaseio.com/${ingredientId}.json`,
-        "DELETE"
+        "DELETE",
+        null,
+        ingredientId,
+        "REMOVE_INGREDIENT"
       );
       //dispatchHttp({ type: "SEND" });
       //  Need backticks to choose which item to delete:
